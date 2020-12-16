@@ -1,0 +1,156 @@
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/7.2.2/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="https://www.gstatic.com/firebasejs/7.2.2/firebase-analytics.js"></script>
+<link rel="stylesheet" href="/static/css/style.css" />
+<!-- Compiled and minified CSS -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+/>
+<link
+  href="https://fonts.googleapis.com/icon?family=Material+Icons"
+  rel="stylesheet"
+/>
+
+<!-- Compiled and minified JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Authenticator</title>
+  </head>
+  <body>
+    <nav>
+      <div class="nav-wrapper">
+        <span class="brand-logo">Authenticator</span>
+
+        <ul class="right">
+          <li>
+            <span class="add" onclick="scanCode();">+</span>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div style="text-align: center">
+      <div class="countdown" id="countdown"></div>
+    </div>
+    <script src="https://static.line-scdn.net/liff/edge/2.1/liff.js"></script>
+    <script>
+      function deleteAccount(name) {
+        fetch('/deleteAccount', {
+          method: 'DELETE',
+          mode: `cors`,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name })
+        })
+          .then(result => {
+            alert('Delete Success')
+            location.reload()
+          })
+          .catch(error => {
+            alert('errror : ', error)
+          })
+      }
+    </script>
+    <script>
+      let users = []
+      function scanCode() {
+        liff.scanCode().then(data => {
+          const stringifiedResult = JSON.stringify(data)
+          //alert(stringifiedResult)
+          fetch('/createAccount', {
+            method: 'POST',
+            mode: `cors`,
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          })
+            .then(result => {
+              alert('Add Success')
+              location.reload()
+            })
+            .catch(error => {
+              alert('errror : ', error)
+            })
+        })
+      }
+      liff.init(
+        { liffId: '1653376598-5DKj42rz' },
+        () => {},
+        err => console.error(err.code, error.message)
+      )
+
+      function getOtp() {
+        fetch('/getUsers', {
+          mode: `cors`
+        })
+          .then(result => {
+            return result.json()
+          })
+          .then(result => {
+            users = result.users
+            result.users.map((items, index) => {
+              var newParagraph = document.createElement('article' + index)
+              newParagraph.insertAdjacentHTML(
+                'beforeEnd',
+                '<div class=""> <div class="border"><div class="content" id="otp-' +
+                  index +
+                  '"></div></div></div>'
+              )
+              document.body.appendChild(newParagraph)
+            })
+          })
+
+        setInterval(() => {
+          users.map((items, index) => {
+            fetch('/authen', {
+              mode: `cors`,
+              headers: {
+                'x-secret': items.secret
+              }
+            })
+              .then(result => {
+                return result.json()
+              })
+              .then(result => {
+                let textHtml =
+                  '<div style="width:100%;"><p style="color:#353535; text-align:left; ">' +
+                  items.type +
+                  '</p>' +
+                  '<p><div style="display:flex;align-items:center;"><div style="width:80%; text-align:left; font-size: 2.5rem; color:#486ab9; margin:-1rem 0">' +
+                  result.otp +
+                  '</div><div style="width:20%; text-align:center;"><button class="btn-floating  blue darken-3" onClick="deleteAccount(`' +
+                  items.type +
+                  ':' +
+                  items.name +
+                  '`);"><i class="material-icons">delete</i></button></div></div></p>' +
+                  '<p style="color:#757575; width:50%;">' +
+                  items.name +
+                  '</p></div><br>'
+                document.getElementById('otp-' + index).innerHTML = textHtml
+              })
+          })
+        }, 1000)
+      }
+      var d = new Date()
+      var n = 30 - (d.getSeconds() % 30)
+      var timeleft = n
+      var downloadTimer = setInterval(function() {
+        d = new Date()
+        document.getElementById('countdown').innerHTML =
+          +timeleft + ' seconds remaining'
+        timeleft = 30 - (d.getSeconds() % 30)
+      }, 1000)
+      getOtp()
+    </script>
+  </body>
+</html>
