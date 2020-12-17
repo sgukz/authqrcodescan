@@ -51,8 +51,9 @@
                 alert(stringifiedResult)
                 liff.getProfile()
                     .then(profile => {
-                        const name = JSON.stringify(profile)
-                        alert(name);
+                        const userId = profile.userId
+                        const name = profile.displayName
+                        document.getElementById('profile').innerHTML = name
                     })
                     .catch((err) => {
                         console.log('error', err);
