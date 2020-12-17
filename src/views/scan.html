@@ -1,16 +1,16 @@
 <!-- The core Firebase JS SDK is always required and must be listed first -->
-<script src="https://www.gstatic.com/firebasejs/7.2.2/firebase-app.js"></script>
+<!-- <script src="https://www.gstatic.com/firebasejs/7.2.2/firebase-app.js"></script> -->
 
 <!-- TODO: Add SDKs for Firebase products that you want to use
      https://firebase.google.com/docs/web/setup#available-libraries -->
-<script src="https://www.gstatic.com/firebasejs/7.2.2/firebase-analytics.js"></script>
+<!-- <script src="https://www.gstatic.com/firebasejs/7.2.2/firebase-analytics.js"></script> -->
 <link rel="stylesheet" href="/static/css/style.css" />
 <!-- Compiled and minified CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" />
+<link rel="stylesheet" href="/static/css/materialize.min.css" />
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 
 <!-- Compiled and minified JavaScript -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script src="/static/js/materialize.min.js"></script>
 <style>
     .item-center {
         position: fixed;
@@ -24,12 +24,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Authenticator</title>
+    <title>1Meeting</title>
 </head>
 
 <body>
     <nav>
         <div class="nav-wrapper green accent-4">
+            <img src="/static/img/new_logo_reh.png" style="margin-top: 5px;" width="50" alt="">
             <span class="brand-logo"><b>1Meeting</b></span>
         </div>
     </nav>
@@ -56,6 +57,15 @@
             () => {},
             err => console.error(err.code, error.message)
         )
+
+        liff.getProfile()
+            .then(profile => {
+                const name = profile
+                alert(name);
+            })
+            .catch((err) => {
+                console.log('error', err);
+            });
 
         // function getOtp() {
         //     fetch('/getUsers', {
